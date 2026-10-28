@@ -1,0 +1,4 @@
+runner:
+  packages:
+    - git
+    - ca-certificates
