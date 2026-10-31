@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode, type RefObject } from "react";
 
 export type ArticleReadingState = "unavailable" | "idle" | "loading" | "playing" | "paused";
 
@@ -7,41 +7,43 @@ export interface ArticleReading {
   toggle: () => void;
   stop: () => void;
   position: number;
+  buffered: number;
   duration: number | null;
   seek: (seconds: number) => void;
+  skip: (delta: number) => void;
   rate: number;
   setRate: (rate: number) => void;
 }
 
 export interface ArticleAudio {
-  useReading: () => ArticleReading;
+  useReading: (article: RefObject<HTMLElement | null>) => ArticleReading;
 }
 
 export interface ArticleAudioLabels {
+  region: string;
   listen: string;
-  loading: string;
+  play: string;
   pause: string;
-  resume: string;
   progress: string;
-  speed: string;
+  reading: string;
 }
 
 export const articleAudioLabels: Record<string, ArticleAudioLabels> = {
   fr: {
-    listen: "Écouter l’article",
-    loading: "Préparation de la lecture…",
+    region: "Lecture audio de l’article",
+    listen: "Écouter cet article",
+    play: "Écouter",
     pause: "Pause",
-    resume: "Reprendre",
     progress: "Position dans la lecture",
-    speed: "Vitesse de lecture",
+    reading: "lecture en cours…",
   },
   en: {
+    region: "Audio version of this article",
     listen: "Listen to this article",
-    loading: "Preparing the reading…",
+    play: "Listen",
     pause: "Pause",
-    resume: "Resume",
-    progress: "Reading position",
-    speed: "Reading speed",
+    progress: "Position in the reading",
+    reading: "reading…",
   },
 };
 
@@ -55,7 +57,7 @@ function labelsFor(lang: string): ArticleAudioLabels {
   return articleAudioLabels[lang.split("-")[0].toLowerCase()] ?? articleAudioLabels.en;
 }
 
-const SPEEDS = [1, 1.25, 1.5, 0.75];
+const SPEEDS = [1, 1.25, 1.5, 2, 0.75];
 
 export function formatReadingTime(seconds: number): string {
   const whole = Math.max(0, Math.floor(seconds));
@@ -66,39 +68,51 @@ export function nextReadingSpeed(rate: number): number {
   return SPEEDS[(SPEEDS.indexOf(rate) + 1) % SPEEDS.length];
 }
 
-function ArticlePlayer({ audio, labels }: { audio: ArticleAudio; labels: ArticleAudioLabels }) {
-  const reading = audio.useReading();
+function ArticlePlayer({ audio, article, labels }: { audio: ArticleAudio; article: RefObject<HTMLElement | null>; labels: ArticleAudioLabels }) {
+  const reading = audio.useReading(article);
   const { stop } = reading;
   useEffect(() => () => stop(), [stop]);
   if (reading.state === "unavailable") return null;
-  if (reading.state === "idle" || reading.state === "loading") {
-    return (
-      <button type="button" className="lalt-article-listen" disabled={reading.state === "loading"} onClick={reading.toggle}>
-        {reading.state === "loading" ? labels.loading : `▶ ${labels.listen}`}
-      </button>
-    );
-  }
   const playing = reading.state === "playing";
+  const active = reading.state !== "idle";
   return (
-    <div className="lalt-article-player">
-      <button type="button" aria-label={playing ? labels.pause : labels.resume} onClick={reading.toggle}>
-        {playing ? "❚❚" : "▶"}
-      </button>
-      <input
-        type="range"
-        aria-label={labels.progress}
-        min={0}
-        max={reading.duration ?? 0}
-        step={1}
-        value={reading.position}
-        disabled={reading.duration === null}
-        onChange={(e) => reading.seek(Number(e.target.value))}
-      />
-      <span>{formatReadingTime(reading.position)}</span>
-      <button type="button" aria-label={labels.speed} onClick={() => reading.setRate(nextReadingSpeed(reading.rate))}>
-        {String(reading.rate).replace(".", ",")}×
-      </button>
-    </div>
+    <section className="lalt-article-player" aria-label={labels.region}>
+      <p className="lalt-article-player-title">{labels.listen}</p>
+      <div className="lalt-article-player-main">
+        <button type="button" className="lalt-article-play" aria-label={playing ? labels.pause : labels.play} onClick={reading.toggle}>
+          {reading.state === "loading" ? <span aria-hidden="true" className="lalt-article-spinner" /> : playing ? "❚❚" : "▶"}
+        </button>
+        <div className="lalt-article-track">
+          <input
+            type="range"
+            aria-label={labels.progress}
+            min={0}
+            max={Math.max(reading.duration ?? reading.buffered, 0.1)}
+            step={0.1}
+            value={reading.position}
+            disabled={!active}
+            onChange={(e) => reading.seek(Number(e.target.value))}
+          />
+          <div className="lalt-article-times">
+            <span>{formatReadingTime(reading.position)}</span>
+            <span>{reading.duration ? formatReadingTime(reading.duration) : active ? labels.reading : ""}</span>
+          </div>
+        </div>
+      </div>
+      {active && (
+        <div className="lalt-article-controls">
+          <button type="button" onClick={() => reading.skip(-15)}>
+            −15 s
+          </button>
+          <button type="button" onClick={() => reading.skip(15)}>
+            +15 s
+          </button>
+          <button type="button" onClick={() => reading.setRate(nextReadingSpeed(reading.rate))}>
+            ×{reading.rate}
+          </button>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -125,8 +139,9 @@ export function Article({
   translations?: ArticleTranslation[];
   className?: string;
 }) {
+  const article = useRef<HTMLElement>(null);
   return (
-    <article lang={lang} className={className ? `lalt-article-page ${className}` : "lalt-article-page"}>
+    <article ref={article} lang={lang} className={className ? `lalt-article-page ${className}` : "lalt-article-page"}>
       {title && <h1 className="lalt-article-title">{title}</h1>}
       {translations && translations.length > 0 && (
         <nav className="lalt-article-translations">
@@ -137,7 +152,7 @@ export function Article({
           ))}
         </nav>
       )}
-      {audio && <ArticlePlayer audio={audio} labels={audioLabels ?? labelsFor(lang)} />}
+      {audio && <ArticlePlayer audio={audio} article={article} labels={audioLabels ?? labelsFor(lang)} />}
       {html === undefined ? <div className="lalt-article">{children}</div> : <ArticleProse html={html} />}
     </article>
   );

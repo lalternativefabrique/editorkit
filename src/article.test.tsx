@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { Article, formatReadingTime, nextReadingSpeed, type ArticleAudio, type ArticleReading } from "./article";
 
 const reading = (over: Partial<ArticleReading>): ArticleAudio => ({
-  useReading: () => ({ state: "idle", toggle() {}, stop() {}, position: 0, duration: null, seek() {}, rate: 1, setRate() {}, ...over }),
+  useReading: () => ({ state: "idle", toggle() {}, stop() {}, position: 0, buffered: 0, duration: null, seek() {}, skip() {}, rate: 1, setRate() {}, ...over }),
 });
 
 describe("Article", () => {
@@ -23,6 +23,7 @@ describe("Article", () => {
     const html = renderToStaticMarkup(<Article html="<p>x</p>" audio={reading({ state: "playing", position: 65, duration: 120 })} />);
     expect(html).toContain("1:05");
     expect(html).toContain("Pause");
+    expect(html).toContain("+15 s");
   });
 });
 
@@ -42,6 +43,6 @@ describe("languages", () => {
 describe("reading controls", () => {
   it("formats and cycles", () => {
     expect(formatReadingTime(9)).toBe("0:09");
-    expect(nextReadingSpeed(0.75)).toBe(1);
+    expect(nextReadingSpeed(1.5)).toBe(2);
   });
 });
