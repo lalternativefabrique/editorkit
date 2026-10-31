@@ -68,7 +68,17 @@ export function nextReadingSpeed(rate: number): number {
   return SPEEDS[(SPEEDS.indexOf(rate) + 1) % SPEEDS.length];
 }
 
-function ArticlePlayer({ audio, article, labels }: { audio: ArticleAudio; article: RefObject<HTMLElement | null>; labels: ArticleAudioLabels }) {
+export function ArticlePlayer({
+  audio,
+  article,
+  lang = "fr",
+  labels = labelsFor(lang),
+}: {
+  audio: ArticleAudio;
+  article: RefObject<HTMLElement | null>;
+  lang?: string;
+  labels?: ArticleAudioLabels;
+}) {
   const reading = audio.useReading(article);
   const { stop } = reading;
   useEffect(() => () => stop(), [stop]);
@@ -152,7 +162,7 @@ export function Article({
           ))}
         </nav>
       )}
-      {audio && <ArticlePlayer audio={audio} article={article} labels={audioLabels ?? labelsFor(lang)} />}
+      {audio && <ArticlePlayer audio={audio} article={article} lang={lang} labels={audioLabels} />}
       {html === undefined ? <div className="lalt-article">{children}</div> : <ArticleProse html={html} />}
     </article>
   );
