@@ -109,7 +109,7 @@
   width: 3rem;
   height: 3rem;
   border-radius: var(--article-radius, 8px);
-  background: var(--article-text, currentColor);
+  background: var(--article-text, CanvasText);
   color: var(--article-on-text, Canvas);
 }
 .lalt-article-spinner {
