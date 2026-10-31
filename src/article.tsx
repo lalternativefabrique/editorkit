@@ -1,22 +1,29 @@
-import { useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useSyncExternalStore, type ReactNode, type RefObject } from "react";
+
+import { createReadAlong } from "./read-along";
+
+export { createReadAlong } from "./read-along";
+export type { ReadAlongOptions, ReadAlongSource } from "./read-along";
 
 export type ArticleReadingState = "unavailable" | "idle" | "loading" | "playing" | "paused";
 
 export interface ArticleReading {
   state: ArticleReadingState;
-  toggle: () => void;
-  stop: () => void;
   position: number;
   buffered: number;
   duration: number | null;
-  seek: (seconds: number) => void;
-  skip: (delta: number) => void;
   rate: number;
-  setRate: (rate: number) => void;
+  text?: string | null;
 }
 
 export interface ArticleAudio {
-  useReading: (article: RefObject<HTMLElement | null>) => ArticleReading;
+  getSnapshot: () => ArticleReading;
+  subscribe: (listener: () => void) => () => void;
+  toggle: () => void;
+  stop: () => void;
+  seek: (seconds: number) => void;
+  skip: (delta: number) => void;
+  setRate: (rate: number) => void;
 }
 
 export interface ArticleAudioLabels {
@@ -79,9 +86,14 @@ export function ArticlePlayer({
   lang?: string;
   labels?: ArticleAudioLabels;
 }) {
-  const reading = audio.useReading(article);
-  const { stop } = reading;
-  useEffect(() => () => stop(), [stop]);
+  const reading = useSyncExternalStore(audio.subscribe, audio.getSnapshot, audio.getSnapshot);
+  useEffect(() => {
+    const detach = createReadAlong(audio, () => article.current);
+    return () => {
+      detach();
+      audio.stop();
+    };
+  }, [audio, article]);
   if (reading.state === "unavailable") return null;
   const playing = reading.state === "playing";
   const active = reading.state !== "idle";
@@ -89,7 +101,7 @@ export function ArticlePlayer({
     <section className="lalt-article-player" aria-label={labels.region}>
       <p className="lalt-article-player-title">{labels.listen}</p>
       <div className="lalt-article-player-main">
-        <button type="button" className="lalt-article-play" aria-label={playing ? labels.pause : labels.play} onClick={reading.toggle}>
+        <button type="button" className="lalt-article-play" aria-label={playing ? labels.pause : labels.play} onClick={audio.toggle}>
           {reading.state === "loading" ? <span aria-hidden="true" className="lalt-article-spinner" /> : playing ? "❚❚" : "▶"}
         </button>
         <div className="lalt-article-track">
@@ -101,7 +113,7 @@ export function ArticlePlayer({
             step={0.1}
             value={reading.position}
             disabled={!active}
-            onChange={(e) => reading.seek(Number(e.target.value))}
+            onChange={(e) => audio.seek(Number(e.target.value))}
           />
           <div className="lalt-article-times">
             <span>{formatReadingTime(reading.position)}</span>
@@ -111,13 +123,13 @@ export function ArticlePlayer({
       </div>
       {active && (
         <div className="lalt-article-controls">
-          <button type="button" onClick={() => reading.skip(-15)}>
+          <button type="button" onClick={() => audio.skip(-15)}>
             −15 s
           </button>
-          <button type="button" onClick={() => reading.skip(15)}>
+          <button type="button" onClick={() => audio.skip(15)}>
             +15 s
           </button>
-          <button type="button" onClick={() => reading.setRate(nextReadingSpeed(reading.rate))}>
+          <button type="button" onClick={() => audio.setRate(nextReadingSpeed(reading.rate))}>
             ×{reading.rate}
           </button>
         </div>

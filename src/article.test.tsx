@@ -2,9 +2,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Article, formatReadingTime, nextReadingSpeed, type ArticleAudio, type ArticleReading } from "./article";
 
-const reading = (over: Partial<ArticleReading>): ArticleAudio => ({
-  useReading: () => ({ state: "idle", toggle() {}, stop() {}, position: 0, buffered: 0, duration: null, seek() {}, skip() {}, rate: 1, setRate() {}, ...over }),
-});
+const reading = (over: Partial<ArticleReading>): ArticleAudio => {
+  const snapshot: ArticleReading = { state: "idle", position: 0, buffered: 0, duration: null, rate: 1, ...over };
+  return { getSnapshot: () => snapshot, subscribe: () => () => {}, toggle() {}, stop() {}, seek() {}, skip() {}, setRate() {} };
+};
 
 describe("Article", () => {
   it("has no player without an adapter", () => {
