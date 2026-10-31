@@ -119,24 +119,26 @@ The player depends on one contract:
 
 ```ts
 interface ArticleAudio {
-  useReading(article: RefObject<HTMLElement | null>): ArticleReading;
+  getSnapshot(): ArticleReading;
+  subscribe(listener: () => void): () => void;
+  toggle(): void;
+  stop(): void;
+  seek(seconds: number): void;
+  skip(delta: number): void;
+  setRate(rate: number): void;
 }
 
 interface ArticleReading {
   state: "unavailable" | "idle" | "loading" | "playing" | "paused";
-  toggle(): void;
-  stop(): void;
   position: number;
   buffered: number;
   duration: number | null;
-  seek(seconds: number): void;
-  skip(delta: number): void;
   rate: number;
-  setRate(rate: number): void;
+  text?: string | null;
 }
 ```
 
-`useReading` is a React hook. It receives the `<article>` element, so an adapter can follow the text. Return `"unavailable"` and the player hides itself.
+It is a plain object with no framework in it. `getSnapshot` returns the same object until something changes. With `state: "unavailable"` the player hides itself.
 
 ### With vvaves
 
@@ -156,19 +158,11 @@ const audio = useMemo(() => readingAudio(() => fetchSignedReading(id)), [id]);
 
 ### With anything else
 
-```tsx
-const audio: ArticleAudio = {
-  useReading() {
-    return useMyVoice(url);
-  },
-};
-```
-
-Keep the adapter stable with `useMemo`, and `stop` stable with `useCallback`: the player calls `stop` on cleanup, so a new function on each render would cut the reading.
+Implement the object above and pass it as `audio`. Create it once per reading, with `useMemo` in React: the player stops it when it changes or unmounts.
 
 ### Read-along
 
-To light up the text as it is read, the adapter registers a [CSS Custom Highlight](https://developer.mozilla.org/docs/Web/API/CSS_Custom_Highlight_API) named `lalt-article-reading`. `article.css` styles it from `--article-accent`. The vvaves adapter does this for you.
+Report the spoken `text` in the snapshot and the sentence being read lights up, for any adapter. It is drawn with the [CSS Custom Highlight API](https://developer.mozilla.org/docs/Web/API/CSS_Custom_Highlight_API) under the name `lalt-article-reading`, styled by `article.css` from `--article-accent`. Outside `ArticlePlayer`, call `createReadAlong(audio, () => element)`.
 
 ### A player outside the article
 
