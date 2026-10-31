@@ -73,3 +73,48 @@
   border: 1px solid var(--article-rule, currentColor);
   text-align: left;
 }
+.lalt-article-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.lalt-article-title {
+  font-family: var(--article-heading-font, inherit);
+  font-size: var(--article-title-size, 2.25rem);
+  font-weight: 500;
+  line-height: 1.15;
+}
+.lalt-article-listen {
+  align-self: flex-start;
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.lalt-article-listen:disabled {
+  opacity: 0.6;
+}
+.lalt-article-player {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--article-rule, currentColor);
+  background: var(--article-surface, Canvas);
+  font-size: 0.875rem;
+}
+.lalt-article-player input {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--article-accent, currentColor);
+}
+.lalt-article-player button {
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  color: inherit;
+}
