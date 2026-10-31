@@ -84,39 +84,71 @@
   font-weight: 500;
   line-height: 1.15;
 }
-.lalt-article-listen {
-  align-self: flex-start;
-  color: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.lalt-article-listen:disabled {
-  opacity: 0.6;
-}
 .lalt-article-player {
-  position: sticky;
-  top: 0.75rem;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--article-rule, currentColor);
+  border-radius: var(--article-radius, 8px);
+  background: var(--article-surface, transparent);
+  font-size: 0.875rem;
+}
+.lalt-article-player-title {
+  color: var(--article-muted, inherit);
+}
+.lalt-article-player-main {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid var(--article-rule, currentColor);
-  background: var(--article-surface, Canvas);
-  font-size: 0.875rem;
+  gap: 1rem;
 }
-.lalt-article-player input {
+.lalt-article-play {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--article-radius, 8px);
+  background: var(--article-text, currentColor);
+  color: var(--article-on-text, Canvas);
+}
+.lalt-article-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: lalt-article-spin 0.8s linear infinite;
+}
+@keyframes lalt-article-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.lalt-article-track {
   flex: 1;
   min-width: 0;
+}
+.lalt-article-track input {
+  width: 100%;
   accent-color: var(--article-accent, currentColor);
 }
-.lalt-article-player button {
-  min-width: 2.25rem;
+.lalt-article-times {
+  display: flex;
+  justify-content: space-between;
+  color: var(--article-muted, inherit);
+  font-size: 0.8125rem;
+}
+.lalt-article-controls {
+  display: flex;
+  gap: 1rem;
+}
+.lalt-article-controls button {
   min-height: 2.25rem;
   color: inherit;
+}
+::highlight(lalt-article-reading) {
+  background-color: color-mix(in srgb, var(--article-accent, #e8a33d) 25%, transparent);
 }
 .lalt-article-translations {
   display: flex;
