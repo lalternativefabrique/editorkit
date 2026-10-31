@@ -5,6 +5,8 @@ export default defineConfig({
     index: "src/index.ts",
     revisions: "src/revisions.ts",
     native: "src/native.ts",
+    article: "src/article.tsx",
+    "article-server": "src/article-server.tsx",
   },
   format: ["esm"],
   dts: true,
@@ -23,5 +25,6 @@ export default defineConfig({
   async onSuccess() {
     const { copyFile } = await import("node:fs/promises");
     await copyFile("src/editor.css", "dist/editor.css");
+    await copyFile("src/article.css", "dist/article.css");
   },
 });
