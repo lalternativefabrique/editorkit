@@ -1,6 +1,6 @@
 {
   "name": "@lalternative/editor",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Shared TipTap editor for L'Alternative apps: rich text, format menu, selection toolbar and inline AI revisions",
   "type": "module",
   "main": "./dist/index.js",
@@ -87,6 +87,15 @@
       "optional": true
     },
     "react-native": {
+      "optional": true
+    },
+    "@tiptap/core": {
+      "optional": true
+    },
+    "@tiptap/pm": {
+      "optional": true
+    },
+    "@tiptap/react": {
       "optional": true
     }
   },

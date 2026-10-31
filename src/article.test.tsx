@@ -26,6 +26,19 @@ describe("Article", () => {
   });
 });
 
+describe("languages", () => {
+  it("speaks the article's language", () => {
+    const html = renderToStaticMarkup(<Article lang="en-GB" html="<p>x</p>" audio={reading({})} />);
+    expect(html).toContain('lang="en-GB"');
+    expect(html).toContain("Listen to this article");
+  });
+
+  it("links the translations", () => {
+    const html = renderToStaticMarkup(<Article html="<p>x</p>" translations={[{ lang: "en", label: "English", href: "/en/a" }]} />);
+    expect(html).toContain('hrefLang="en"');
+  });
+});
+
 describe("reading controls", () => {
   it("formats and cycles", () => {
     expect(formatReadingTime(9)).toBe("0:09");
