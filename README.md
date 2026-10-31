@@ -10,6 +10,8 @@ the article people read, and the player that reads it to them.
 [![npm](https://img.shields.io/npm/v/@lalternative/editor)](https://www.npmjs.com/package/@lalternative/editor)
 [![license](https://img.shields.io/badge/license-MPL--2.0-blue)](LICENSE)
 
+<a href="docs/articles.md#vue-svelte-and-plain-js"><img src="https://skillicons.dev/icons?i=react,vue,svelte,js" alt="React, Vue, Svelte, JavaScript"></a>
+
 </div>
 
 ```tsx
