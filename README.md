@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/banner.png" alt="editorkit: write, publish, listen" width="100%">
+<img src="https://raw.githubusercontent.com/lalternativefabrique/editorkit/main/docs/assets/banner.png" alt="editorkit: write, publish, listen" width="100%">
 
 **Write it. Publish it. Hear it read aloud.**
 
