@@ -1,6 +1,6 @@
 <div align="center">
 
-# ✍️ editorkit
+<img src="docs/assets/banner.png" alt="editorkit: write, publish, listen" width="100%">
 
 **Write it. Publish it. Hear it read aloud.**
 
