@@ -26,14 +26,34 @@ export interface ArticleAudioLabels {
   speed: string;
 }
 
-export const defaultArticleAudioLabels: ArticleAudioLabels = {
-  listen: "Écouter l’article",
-  loading: "Préparation de la lecture…",
-  pause: "Pause",
-  resume: "Reprendre",
-  progress: "Position dans la lecture",
-  speed: "Vitesse de lecture",
+export const articleAudioLabels: Record<string, ArticleAudioLabels> = {
+  fr: {
+    listen: "Écouter l’article",
+    loading: "Préparation de la lecture…",
+    pause: "Pause",
+    resume: "Reprendre",
+    progress: "Position dans la lecture",
+    speed: "Vitesse de lecture",
+  },
+  en: {
+    listen: "Listen to this article",
+    loading: "Preparing the reading…",
+    pause: "Pause",
+    resume: "Resume",
+    progress: "Reading position",
+    speed: "Reading speed",
+  },
 };
+
+export interface ArticleTranslation {
+  lang: string;
+  label: string;
+  href: string;
+}
+
+function labelsFor(lang: string): ArticleAudioLabels {
+  return articleAudioLabels[lang.split("-")[0].toLowerCase()] ?? articleAudioLabels.en;
+}
 
 const SPEEDS = [1, 1.25, 1.5, 0.75];
 
@@ -91,7 +111,9 @@ export function Article({
   html,
   children,
   audio,
-  audioLabels = defaultArticleAudioLabels,
+  audioLabels,
+  lang = "fr",
+  translations,
   className,
 }: {
   title?: ReactNode;
@@ -99,12 +121,23 @@ export function Article({
   children?: ReactNode;
   audio?: ArticleAudio;
   audioLabels?: ArticleAudioLabels;
+  lang?: string;
+  translations?: ArticleTranslation[];
   className?: string;
 }) {
   return (
-    <article className={className ? `lalt-article-page ${className}` : "lalt-article-page"}>
+    <article lang={lang} className={className ? `lalt-article-page ${className}` : "lalt-article-page"}>
       {title && <h1 className="lalt-article-title">{title}</h1>}
-      {audio && <ArticlePlayer audio={audio} labels={audioLabels} />}
+      {translations && translations.length > 0 && (
+        <nav className="lalt-article-translations">
+          {translations.map((t) => (
+            <a key={t.lang} href={t.href} lang={t.lang} hrefLang={t.lang}>
+              {t.label}
+            </a>
+          ))}
+        </nav>
+      )}
+      {audio && <ArticlePlayer audio={audio} labels={audioLabels ?? labelsFor(lang)} />}
       {html === undefined ? <div className="lalt-article">{children}</div> : <ArticleProse html={html} />}
     </article>
   );
