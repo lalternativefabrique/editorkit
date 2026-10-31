@@ -1,0 +1,12 @@
+version: 1
+kind: devstack
+name: dev
+
+services:
+  playground:
+    run: pnpm install --frozen-lockfile && pnpm playground
+    port: 5198
+
+  playground-article:
+    run: pnpm install --frozen-lockfile && pnpm playground:article
+    port: 5199

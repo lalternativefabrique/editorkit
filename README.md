@@ -31,11 +31,14 @@ A text should not need a different implementation in every app. `@lalternative/e
 
 ## What's inside
 
-React 18 or later is required, on the server too. `article.css` has no dependency.
+React is only required by the React entries and by `renderArticleHtml` on the server. `article.css` has no dependency.
 
 | Entry point | What you get |
 | --- | --- |
 | `@lalternative/editor/article` | `Article`, `ArticleProse`, `ArticlePlayer` and the audio contract |
+| `@lalternative/editor/vue` | `Article` for Vue 3 |
+| `@lalternative/editor/svelte` | `Article` for Svelte 5 |
+| `@lalternative/editor/article/element` | `<lalt-article-player>` and `mountArticle` for plain JS, built on Lit |
 | `@lalternative/editor/article/server` | `renderArticleHtml`: Markdown or MDX to HTML, on the server |
 | `@lalternative/editor/article.css` | Article and player styles |
 | `@lalternative/editor` | The TipTap writing surface: screen, toolbars, slash commands, dictation, revisions |
@@ -73,6 +76,35 @@ import "@lalternative/editor/article.css";
 Without a server step, pass `children` instead of `html` and render the prose yourself: the styles still apply. To show the prose alone, use `<ArticleProse html={html} />`.
 
 > `ArticleProse` and `Article` inject `html` as it is. Give them what `renderArticleHtml` returned, nothing else.
+
+### Vue, Svelte and plain JS
+
+The props are the same everywhere. `audio` is the same object.
+
+```vue
+<script setup>
+import { Article } from "@lalternative/editor/vue";
+import "@lalternative/editor/article.css";
+</script>
+
+<template><Article :title="title" :html="html" :audio="audio" /></template>
+```
+
+```svelte
+<script>
+  import Article from "@lalternative/editor/svelte";
+  import "@lalternative/editor/article.css";
+</script>
+
+<Article {title} {html} {audio} />
+```
+
+```js
+import { mountArticle } from "@lalternative/editor/article/element";
+import "@lalternative/editor/article.css";
+
+const unmount = mountArticle(document.getElementById("app"), { title, html, audio });
+```
 
 ### Markdown or MDX
 
@@ -237,7 +269,7 @@ No model and no backend are bundled: `Revise`, `FindSources` and `transcribe` ar
 
 ```sh
 pnpm install
-pnpm playground   # local playground
+sklp dev stack    # editor on :5198, article in JS, Vue and Svelte on :5199
 pnpm test
 pnpm typecheck
 pnpm build
