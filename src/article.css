@@ -1,0 +1,75 @@
+.lalt-article {
+  color: var(--article-text, inherit);
+  font-family: var(--article-font, inherit);
+  font-size: var(--article-size, 1.125rem);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.lalt-article > * + * {
+  margin-top: 1em;
+}
+.lalt-article h1,
+.lalt-article h2 {
+  margin-top: 1.8em;
+  font-family: var(--article-heading-font, inherit);
+  font-size: 1.6em;
+  font-weight: 500;
+  line-height: 1.25;
+}
+.lalt-article h3,
+.lalt-article h4,
+.lalt-article h5,
+.lalt-article h6 {
+  margin-top: 1.5em;
+  font-family: var(--article-heading-font, inherit);
+  font-size: 1.25em;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.lalt-article ul {
+  padding-left: 1.4em;
+  list-style: disc;
+}
+.lalt-article ol {
+  padding-left: 1.4em;
+  list-style: decimal;
+}
+.lalt-article blockquote {
+  padding-left: 1em;
+  border-left: 2px solid var(--article-accent, currentColor);
+  color: var(--article-muted, inherit);
+}
+.lalt-article a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.lalt-article img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--article-radius, 8px);
+}
+.lalt-article hr {
+  margin: 2em 0;
+  border: 0;
+  border-top: 1px solid var(--article-rule, currentColor);
+  opacity: 0.3;
+}
+.lalt-article pre {
+  overflow-x: auto;
+}
+.lalt-article code {
+  font-family: var(--article-mono, ui-monospace, monospace);
+  font-size: 0.9em;
+}
+.lalt-article table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+.lalt-article th,
+.lalt-article td {
+  padding: 0.4em 0.8em;
+  border: 1px solid var(--article-rule, currentColor);
+  text-align: left;
+}
