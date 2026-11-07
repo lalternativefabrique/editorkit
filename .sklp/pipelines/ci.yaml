@@ -19,9 +19,9 @@ steps:
       fi
 
   - name: editor
-    tools: [node]
+    tools: [node, pnpm]
     run: |
-      CI=true npx -y pnpm@11.3.0 install --frozen-lockfile
-      npx -y pnpm@11.3.0 test
-      npx -y pnpm@11.3.0 typecheck
-      npx -y pnpm@11.3.0 build
+      CI=true pnpm install --frozen-lockfile
+      pnpm test
+      pnpm typecheck
+      pnpm build
