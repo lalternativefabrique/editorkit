@@ -12,6 +12,8 @@ export interface SlashCommandsOptions {
    *  TipTap — rebuilding the extensions array wipes the text being typed. */
   items: (query: string) => SlashItem[];
   char: string;
+  /** Lets the typed text hold spaces, for triggers that name something, such as a page title. */
+  allowSpaces?: boolean;
   emptyLabel?: string;
   /** Distinguishes concurrently mounted editors: two surfaces sharing one key
    *  would answer each other's suggestions. */
@@ -55,11 +57,12 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
   },
 
   addProseMirrorPlugins() {
-    const { items, char, emptyLabel, pluginKey } = this.options;
+    const { items, char, allowSpaces = false, emptyLabel, pluginKey } = this.options;
 
     const suggestion: Omit<SuggestionOptions<SlashItem>, "editor"> = {
       char,
       pluginKey,
+      allowSpaces,
       startOfLine: false,
       items: ({ query }) => filterSlashItems(items(query), query),
       render: () => {
