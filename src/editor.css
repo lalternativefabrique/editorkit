@@ -367,7 +367,9 @@
 .lalt-slash {
   min-width: 16rem;
   max-width: min(20rem, calc(100vw - 1.5rem));
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid var(--lalt-editor-border);
   border-radius: 0.5rem;
   background: var(--lalt-editor-surface);
