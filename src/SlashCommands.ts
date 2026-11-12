@@ -14,6 +14,7 @@ export interface SlashCommandsOptions {
   char: string;
   /** Lets the typed text hold spaces, for triggers that name something, such as a page title. */
   allowSpaces?: boolean;
+  /** Shown when nothing matches; an empty string shows nothing. */
   emptyLabel?: string;
   /** Distinguishes concurrently mounted editors: two surfaces sharing one key
    *  would answer each other's suggestions. */

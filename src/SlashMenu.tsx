@@ -77,7 +77,7 @@ export const SlashMenu = forwardRef<SlashMenuHandle, SlashMenuProps>(
     }));
 
     if (items.length === 0) {
-      return <div className="lalt-slash lalt-slash--empty">{emptyLabel}</div>;
+      return emptyLabel ? <div className="lalt-slash lalt-slash--empty">{emptyLabel}</div> : null;
     }
 
     return (
