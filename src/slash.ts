@@ -120,8 +120,19 @@ export function defaultSlashItems({
 }
 
 /** filterSlashItems matches the query against titles the way the menu does. */
+const fold = (text: string) =>
+  text
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
+
+/** Items whose title holds the query come first, then those whose description does; accents and case are ignored. */
 export function filterSlashItems(items: SlashItem[], query: string): SlashItem[] {
-  const q = query.trim().toLowerCase();
+  const q = fold(query.trim());
   if (q === "") return items;
-  return items.filter((item) => item.title.toLowerCase().includes(q));
+  const inTitle = items.filter((item) => fold(item.title).includes(q));
+  const inDescription = items.filter(
+    (item) => !inTitle.includes(item) && fold(item.description ?? "").includes(q),
+  );
+  return [...inTitle, ...inDescription];
 }
