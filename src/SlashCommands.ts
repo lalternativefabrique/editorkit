@@ -7,9 +7,10 @@ import { SlashMenu, type SlashMenuHandle, type SlashMenuProps } from "./SlashMen
 import { filterSlashItems, type SlashItem } from "./slash";
 
 export interface SlashCommandsOptions {
-  /** Read on every keystroke, so a host can swap the set without remounting
+  /** Read on every keystroke with the text typed after the trigger, so a host
+   *  can swap the set, or offer to act on that text, without remounting
    *  TipTap — rebuilding the extensions array wipes the text being typed. */
-  items: () => SlashItem[];
+  items: (query: string) => SlashItem[];
   char: string;
   emptyLabel?: string;
   /** Distinguishes concurrently mounted editors: two surfaces sharing one key
@@ -60,7 +61,7 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
       char,
       pluginKey,
       startOfLine: false,
-      items: ({ query }) => filterSlashItems(items(), query),
+      items: ({ query }) => filterSlashItems(items(query), query),
       render: () => {
         let component: ReactRenderer<SlashMenuHandle, SlashMenuProps> | null = null;
         let container: HTMLDivElement | null = null;
