@@ -7,10 +7,14 @@ import { SlashMenu, type SlashMenuHandle, type SlashMenuProps } from "./SlashMen
 import { filterSlashItems, type SlashItem } from "./slash";
 
 export interface SlashCommandsOptions {
-  /** Read on every keystroke, so a host can swap the set without remounting
+  /** Read on every keystroke with the text typed after the trigger, so a host
+   *  can swap the set, or offer to act on that text, without remounting
    *  TipTap — rebuilding the extensions array wipes the text being typed. */
-  items: () => SlashItem[];
+  items: (query: string) => SlashItem[];
   char: string;
+  /** Lets the typed text hold spaces, for triggers that name something, such as a page title. */
+  allowSpaces?: boolean;
+  /** Shown when nothing matches; an empty string shows nothing. */
   emptyLabel?: string;
   /** Distinguishes concurrently mounted editors: two surfaces sharing one key
    *  would answer each other's suggestions. */
@@ -18,6 +22,29 @@ export interface SlashCommandsOptions {
 }
 
 const OFFSET = 6;
+const MARGIN = 8;
+
+export interface MenuPlacement {
+  top: number;
+  left: number;
+  maxHeight: number;
+}
+
+/** Below the caret when the menu fits there, else on whichever side has more room, capped to it. */
+export function placeMenu(
+  caret: { top: number; bottom: number; left: number },
+  menu: { width: number; height: number },
+  viewport: { width: number; height: number },
+): MenuPlacement {
+  const below = viewport.height - caret.bottom - OFFSET - MARGIN;
+  const above = caret.top - OFFSET - MARGIN;
+  const left = Math.max(MARGIN, Math.min(caret.left, viewport.width - menu.width - MARGIN));
+  if (menu.height <= below || below >= above) {
+    return { top: caret.bottom + OFFSET, left, maxHeight: Math.max(below, 0) };
+  }
+  const height = Math.min(menu.height, above);
+  return { top: caret.top - OFFSET - height, left, maxHeight: above };
+}
 
 export const SlashCommands = Extension.create<SlashCommandsOptions>({
   name: "laSlashCommands",
@@ -31,13 +58,14 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
   },
 
   addProseMirrorPlugins() {
-    const { items, char, emptyLabel, pluginKey } = this.options;
+    const { items, char, allowSpaces = false, emptyLabel, pluginKey } = this.options;
 
     const suggestion: Omit<SuggestionOptions<SlashItem>, "editor"> = {
       char,
       pluginKey,
+      allowSpaces,
       startOfLine: false,
-      items: ({ query }) => filterSlashItems(items(), query),
+      items: ({ query }) => filterSlashItems(items(query), query),
       render: () => {
         let component: ReactRenderer<SlashMenuHandle, SlashMenuProps> | null = null;
         let container: HTMLDivElement | null = null;
@@ -45,9 +73,23 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
         const place = (clientRect: SuggestionProps<SlashItem>["clientRect"]) => {
           if (!container || !clientRect) return;
           const rect = clientRect();
-          if (!rect) return;
-          container.style.top = `${rect.bottom + OFFSET}px`;
-          container.style.left = `${rect.left}px`;
+          const menu = container.firstElementChild as HTMLElement | null;
+          if (!rect || !menu) return;
+          menu.style.maxHeight = "";
+          const { top, left, maxHeight } = placeMenu(
+            rect,
+            { width: menu.offsetWidth, height: menu.scrollHeight },
+            { width: window.innerWidth, height: window.innerHeight },
+          );
+          menu.style.maxHeight = `${maxHeight}px`;
+          container.style.top = `${top}px`;
+          container.style.left = `${left}px`;
+        };
+        // React renders the menu after onStart and onUpdate return, so its
+        // size is only known on the next frame.
+        const placeSoon = (clientRect: SuggestionProps<SlashItem>["clientRect"]) => {
+          place(clientRect);
+          requestAnimationFrame(() => place(clientRect));
         };
 
         const close = () => {
@@ -67,11 +109,11 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
             container.className = "lalt-slash-anchor";
             container.appendChild(component.element);
             document.body.appendChild(container);
-            place(props.clientRect);
+            placeSoon(props.clientRect);
           },
           onUpdate: (props) => {
             component?.updateProps({ ...props, emptyLabel });
-            place(props.clientRect);
+            placeSoon(props.clientRect);
           },
           onKeyDown: (props) => {
             if (props.event.key === "Escape") {

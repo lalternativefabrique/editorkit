@@ -85,4 +85,18 @@ describe("filterSlashItems", () => {
   it("returns nothing when no title matches", () => {
     expect(filterSlashItems(items, "zzz")).toEqual([]);
   });
+
+  it("ignores accents on either side", () => {
+    const tasks: SlashItem[] = [{ id: "t", title: "Liste de tâches", command: vi.fn() }];
+    expect(filterSlashItems(tasks, "taches").map((i) => i.id)).toEqual(["t"]);
+    expect(filterSlashItems(items, "cîta").map((i) => i.id)).toEqual(["b"]);
+  });
+
+  it("finds a description after the titles", () => {
+    const withDescriptions: SlashItem[] = [
+      { id: "tasks", title: "Liste de tâches", description: "des cases à cocher", command: vi.fn() },
+      { id: "case", title: "Casse", command: vi.fn() },
+    ];
+    expect(filterSlashItems(withDescriptions, "cas").map((i) => i.id)).toEqual(["case", "tasks"]);
+  });
 });

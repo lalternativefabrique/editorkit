@@ -33,6 +33,11 @@ export const SlashMenu = forwardRef<SlashMenuHandle, SlashMenuProps>(
     const selectedRef = useRef(selectedIndex);
     selectedRef.current = selectedIndex;
 
+    const list = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+      list.current?.children[selectedIndex]?.scrollIntoView({ block: "nearest" });
+    }, [selectedIndex]);
+
     const ids = items.map((item) => item.id).join(" ");
     useEffect(() => {
       setSelectedIndex(0);
@@ -72,11 +77,11 @@ export const SlashMenu = forwardRef<SlashMenuHandle, SlashMenuProps>(
     }));
 
     if (items.length === 0) {
-      return <div className="lalt-slash lalt-slash--empty">{emptyLabel}</div>;
+      return emptyLabel ? <div className="lalt-slash lalt-slash--empty">{emptyLabel}</div> : null;
     }
 
     return (
-      <div className="lalt-slash" role="listbox">
+      <div className="lalt-slash" role="listbox" ref={list}>
         {items.map((item, index) => (
           <button
             key={item.id}
