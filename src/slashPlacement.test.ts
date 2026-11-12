@@ -6,25 +6,43 @@ const viewport = { width: 1000, height: 800 };
 const menu = { width: 320, height: 600 };
 
 describe("placing the slash menu", () => {
-  it("opens below the caret when the menu fits there", () => {
+  it("opens below the caret, no taller than the cap, and scrolls inside", () => {
     expect(placeMenu({ top: 80, bottom: 100, left: 40 }, menu, viewport)).toEqual({
       top: 106,
       left: 40,
-      maxHeight: 686,
+      maxHeight: 320,
     });
   });
 
-  it("opens above a caret low on the page, no taller than the room there", () => {
-    const placed = placeMenu({ top: 700, bottom: 720, left: 40 }, menu, viewport);
-    expect(placed).toEqual({ top: 94, left: 40, maxHeight: 686 });
-    expect(placed.top + menu.height).toBeLessThanOrEqual(700);
+  it("grows to a custom cap", () => {
+    expect(placeMenu({ top: 80, bottom: 100, left: 40 }, menu, viewport, 500).maxHeight).toBe(500);
   });
 
-  it("stays below and scrolls when below has more room than above", () => {
-    expect(placeMenu({ top: 300, bottom: 320, left: 40 }, menu, viewport)).toEqual({
-      top: 326,
+  it("opens above a caret low on the page, right on top of it", () => {
+    const placed = placeMenu({ top: 700, bottom: 720, left: 40 }, menu, viewport);
+    expect(placed).toEqual({ top: 374, left: 40, maxHeight: 320 });
+    expect(placed.top + placed.maxHeight).toBe(694);
+  });
+
+  it("opens above with a short list hugging the caret", () => {
+    const placed = placeMenu(
+      { top: 700, bottom: 720, left: 40 },
+      { width: 320, height: 120 },
+      viewport,
+    );
+    expect(placed.top).toBe(574);
+  });
+
+  it("stays below, shorter, when below has more room than above", () => {
+    expect(
+      placeMenu({ top: 260, bottom: 280, left: 40 }, menu, {
+        width: 1000,
+        height: 560,
+      }),
+    ).toEqual({
+      top: 286,
       left: 40,
-      maxHeight: 466,
+      maxHeight: 266,
     });
   });
 

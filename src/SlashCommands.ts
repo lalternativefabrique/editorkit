@@ -16,6 +16,8 @@ export interface SlashCommandsOptions {
   allowSpaces?: boolean;
   /** Shown when nothing matches; an empty string shows nothing. */
   emptyLabel?: string;
+  /** Tallest the menu grows before it scrolls, in pixels. */
+  maxHeight?: number;
   /** Distinguishes concurrently mounted editors: two surfaces sharing one key
    *  would answer each other's suggestions. */
   pluginKey: PluginKey;
@@ -23,6 +25,7 @@ export interface SlashCommandsOptions {
 
 const OFFSET = 6;
 const MARGIN = 8;
+const MAX_HEIGHT = 320;
 
 export interface MenuPlacement {
   top: number;
@@ -30,20 +33,26 @@ export interface MenuPlacement {
   maxHeight: number;
 }
 
-/** Below the caret when the menu fits there, else on whichever side has more room, capped to it. */
+/** Below the caret when the menu fits there, else on whichever side has more room, never taller than `cap`. */
 export function placeMenu(
   caret: { top: number; bottom: number; left: number },
   menu: { width: number; height: number },
   viewport: { width: number; height: number },
+  cap = MAX_HEIGHT,
 ): MenuPlacement {
   const below = viewport.height - caret.bottom - OFFSET - MARGIN;
   const above = caret.top - OFFSET - MARGIN;
+  const wanted = Math.min(menu.height, cap);
   const left = Math.max(MARGIN, Math.min(caret.left, viewport.width - menu.width - MARGIN));
-  if (menu.height <= below || below >= above) {
-    return { top: caret.bottom + OFFSET, left, maxHeight: Math.max(below, 0) };
+  if (wanted <= below || below >= above) {
+    return {
+      top: caret.bottom + OFFSET,
+      left,
+      maxHeight: Math.max(Math.min(below, cap), 0),
+    };
   }
-  const height = Math.min(menu.height, above);
-  return { top: caret.top - OFFSET - height, left, maxHeight: above };
+  const height = Math.min(wanted, above);
+  return { top: caret.top - OFFSET - height, left, maxHeight: height };
 }
 
 export const SlashCommands = Extension.create<SlashCommandsOptions>({
@@ -58,7 +67,14 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
   },
 
   addProseMirrorPlugins() {
-    const { items, char, allowSpaces = false, emptyLabel, pluginKey } = this.options;
+    const {
+      items,
+      char,
+      allowSpaces = false,
+      emptyLabel,
+      maxHeight: cap = MAX_HEIGHT,
+      pluginKey,
+    } = this.options;
 
     const suggestion: Omit<SuggestionOptions<SlashItem>, "editor"> = {
       char,
@@ -73,13 +89,14 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
         const place = (clientRect: SuggestionProps<SlashItem>["clientRect"]) => {
           if (!container || !clientRect) return;
           const rect = clientRect();
-          const menu = container.firstElementChild as HTMLElement | null;
+          const menu = container.querySelector<HTMLElement>(".lalt-slash");
           if (!rect || !menu) return;
           menu.style.maxHeight = "";
           const { top, left, maxHeight } = placeMenu(
             rect,
             { width: menu.offsetWidth, height: menu.scrollHeight },
             { width: window.innerWidth, height: window.innerHeight },
+            cap,
           );
           menu.style.maxHeight = `${maxHeight}px`;
           container.style.top = `${top}px`;
