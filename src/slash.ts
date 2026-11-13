@@ -18,6 +18,8 @@ export interface SlashItem {
   description?: string;
   shortcut?: string;
   icon?: React.ReactNode;
+  /** Shown beside the menu while the item is highlighted: what the block will look like once inserted. */
+  preview?: React.ReactNode;
   /** Items sharing a group are listed under its name while nothing is typed; keep them adjacent. */
   group?: string;
   command: (args: { editor: Editor; range: Range }) => void;

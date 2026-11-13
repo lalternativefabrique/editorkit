@@ -94,7 +94,7 @@ export const SlashCommands = Extension.create<SlashCommandsOptions>({
           menu.style.maxHeight = "";
           const { top, left, maxHeight } = placeMenu(
             rect,
-            { width: menu.offsetWidth, height: menu.scrollHeight },
+            { width: container.offsetWidth, height: menu.scrollHeight },
             { width: window.innerWidth, height: window.innerHeight },
             cap,
           );
