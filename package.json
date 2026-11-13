@@ -1,6 +1,6 @@
 {
   "name": "@lalternative/editor",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "Shared editor and article for L'Alternative apps: TipTap writing surface, article rendering and audio player for React, Vue, Svelte and plain JS",
   "type": "module",
   "main": "./dist/index.js",

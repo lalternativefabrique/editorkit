@@ -89,52 +89,64 @@ export const SlashMenu = forwardRef<SlashMenuHandle, SlashMenuProps>(function Sl
   }
 
   const grouped = query.trim() === "";
+  const active = items[selectedIndex];
 
   return (
-    <div className="lalt-slash" role="listbox" ref={list}>
-      {items.map((item, index) => (
-        <Fragment key={item.id}>
-          {grouped && item.group && item.group !== items[index - 1]?.group && (
-            <div className="lalt-slash__group" role="presentation">
-              {item.group}
-            </div>
-          )}
-          <button
-            data-index={index}
-            type="button"
-            role="option"
-            aria-selected={index === selectedIndex}
-            className={
-              index === selectedIndex
-                ? "lalt-slash__item lalt-slash__item--active"
-                : "lalt-slash__item"
-            }
-            // Losing editor focus tears the suggestion plugin down before a
-            // click lands, so the item would never run its command.
-            onMouseDown={(event) => {
-              event.preventDefault();
-              selectItem(index);
-            }}
-            onMouseEnter={() => {
-              selectedRef.current = index;
-              setSelectedIndex(index);
-            }}
-          >
-            {item.icon && (
-              <span className="lalt-slash__icon" aria-hidden>
-                {item.icon}
-              </span>
+    <div className="lalt-slash-menu">
+      <div className="lalt-slash" role="listbox" ref={list}>
+        {items.map((item, index) => (
+          <Fragment key={item.id}>
+            {grouped && item.group && item.group !== items[index - 1]?.group && (
+              <div className="lalt-slash__group" role="presentation">
+                {item.group}
+              </div>
             )}
-            <span className="lalt-slash__text">
-              <span className="lalt-slash__title">{item.title}</span>
-              {item.description && (
-                <span className="lalt-slash__description">{item.description}</span>
+            <button
+              data-index={index}
+              type="button"
+              role="option"
+              aria-selected={index === selectedIndex}
+              className={
+                index === selectedIndex
+                  ? "lalt-slash__item lalt-slash__item--active"
+                  : "lalt-slash__item"
+              }
+              // Losing editor focus tears the suggestion plugin down before a
+              // click lands, so the item would never run its command.
+              onMouseDown={(event) => {
+                event.preventDefault();
+                selectItem(index);
+              }}
+              onMouseEnter={() => {
+                selectedRef.current = index;
+                setSelectedIndex(index);
+              }}
+            >
+              {item.icon && (
+                <span className="lalt-slash__icon" aria-hidden>
+                  {item.icon}
+                </span>
               )}
-            </span>
-            {item.shortcut && <kbd className="lalt-slash__shortcut">{item.shortcut}</kbd>}
-          </button>
-        </Fragment>
-      ))}
+              <span className="lalt-slash__text">
+                <span className="lalt-slash__title">{item.title}</span>
+                {item.description && (
+                  <span className="lalt-slash__description">{item.description}</span>
+                )}
+              </span>
+              {item.shortcut && <kbd className="lalt-slash__shortcut">{item.shortcut}</kbd>}
+            </button>
+          </Fragment>
+        ))}
+      </div>
+      {active?.preview && (
+        <div className="lalt-slash__preview" aria-hidden>
+          <div className="lalt-slash__preview-art">{active.preview}</div>
+          <div className="lalt-slash__preview-title">{active.title}</div>
+          {active.description && (
+            <div className="lalt-slash__preview-description">{active.description}</div>
+          )}
+        </div>
+      )}
     </div>
   );
 });
