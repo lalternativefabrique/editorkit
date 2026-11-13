@@ -21,8 +21,10 @@ import { fakeFindSources, fakeRevise, fakeTranscribe, SAMPLE_ANSWER } from "./wr
 import { KEYBOARD_HEIGHT, KeyboardOverlay, useSimulatedKeyboard } from "./keyboard"
 import { SAMPLE } from "./sample"
 import "./styles.css"
+import "./slash-ombak.css"
+import { dressSlashItems } from "./slashDress"
 
-const SLASH_ITEMS = defaultSlashItems({
+const SLASH_ITEMS = dressSlashItems(defaultSlashItems({
   descriptions: {
     heading1: "Grand titre de section",
     heading2: "Sous-titre",
@@ -32,7 +34,7 @@ const SLASH_ITEMS = defaultSlashItems({
     codeBlock: "Code monospace",
     horizontalRule: "Ligne horizontale",
   },
-})
+}))
 
 const slashCommands = SlashCommands.configure({
   items: () => SLASH_ITEMS,
