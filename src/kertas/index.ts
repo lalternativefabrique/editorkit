@@ -58,4 +58,5 @@ export type { KertasWriterOptions, Reading, WriterFiles, WriterOptions, WriterPa
 export { CitedIn, ReadOnlyWriting, WritingText, WritingTools } from "./surface/WritingSurface";
 export type { ReadOnly } from "./surface/WritingSurface";
 export { WritingMenu } from "./surface/WritingMenu";
+export type { WritingAction } from "./surface/WritingMenu";
 export { dressSlashItems } from "./surface/slashDress";

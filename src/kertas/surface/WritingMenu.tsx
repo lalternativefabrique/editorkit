@@ -24,7 +24,27 @@ function downloadDocx(editor: Editor, title: string, engine: Kertas): void {
 
 type Panel = "menu" | "review" | "print" | null;
 
-export function WritingMenu({ editor, engine, title, author }: { editor: Editor | null; engine: Kertas; title: string; author: string }) {
+export interface WritingAction {
+  label: string;
+  hint?: string;
+  run: () => void;
+}
+
+export function WritingMenu({
+  editor,
+  engine,
+  title,
+  author,
+  actions = [],
+  toggleClassName = "",
+}: {
+  editor: Editor | null;
+  engine: Kertas;
+  title: string;
+  author: string;
+  actions?: WritingAction[];
+  toggleClassName?: string;
+}) {
   const [panel, setPanel] = useState<Panel>(null);
   const box = useRef<HTMLDivElement>(null);
 
@@ -43,10 +63,10 @@ export function WritingMenu({ editor, engine, title, author }: { editor: Editor 
   }, [panel]);
 
   if (!editor) return null;
-  const item = (label: string, hint: string, run: () => void) => (
-    <button type="button" role="menuitem" className="kertas-menu-item" onClick={run}>
+  const item = (label: string, hint: string | undefined, run: () => void) => (
+    <button key={label} type="button" role="menuitem" className="kertas-menu-item" onClick={run}>
       <span>{label}</span>
-      <span className="kertas-menu-hint">{hint}</span>
+      {hint && <span className="kertas-menu-hint">{hint}</span>}
     </button>
   );
 
@@ -54,7 +74,7 @@ export function WritingMenu({ editor, engine, title, author }: { editor: Editor 
     <div className="kertas-menu" ref={box}>
       <button
         type="button"
-        className="kertas-menu-toggle"
+        className={`kertas-menu-toggle ${toggleClassName}`.trim()}
         aria-label="Plus d’actions"
         aria-haspopup="menu"
         aria-expanded={panel !== null}
@@ -70,6 +90,12 @@ export function WritingMenu({ editor, engine, title, author }: { editor: Editor 
             setPanel(null);
             downloadDocx(editor, title || "Sans titre", engine);
           })}
+          {actions.map((action) =>
+            item(action.label, action.hint, () => {
+              setPanel(null);
+              action.run();
+            }),
+          )}
         </div>
       )}
       {panel === "review" && (
