@@ -1,4 +1,3 @@
-/// <reference path="./pdfjs-assets.d.ts" />
 import { Extension, mergeAttributes, Node, type Editor } from "@tiptap/core";
 import type { Node as PMNode } from "@tiptap/pm/model";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
@@ -6,6 +5,7 @@ import type { NodeView } from "@tiptap/pm/view";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 
 import type { ResolveImage, UploadImage } from "./writing";
+import { kertasAsset } from "./assets";
 
 export type PdfView = "line" | "card" | "reader";
 
@@ -71,8 +71,12 @@ const VIEWS: { view: PdfView; label: string }[] = [
 let pdfjs: Promise<typeof import("pdfjs-dist")> | null = null;
 
 function loadPdfjs() {
-  pdfjs ??= Promise.all([import("pdfjs-dist"), import("pdfjs-dist/build/pdf.worker.min.mjs?url"), import("pdfjs-dist/web/pdf_viewer.css")]).then(([lib, worker]) => {
-    lib.GlobalWorkerOptions.workerSrc = worker.default;
+  pdfjs ??= import("pdfjs-dist").then((lib) => {
+    lib.GlobalWorkerOptions.workerSrc = kertasAsset("pdf.worker.min.mjs");
+    const style = document.createElement("link");
+    style.rel = "stylesheet";
+    style.href = kertasAsset("pdf_viewer.css");
+    document.head.append(style);
     return lib;
   });
   return pdfjs;

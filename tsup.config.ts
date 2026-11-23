@@ -36,6 +36,9 @@ export default defineConfig({
     await copyFile("src/kertas/surface/writing.css", "dist/writing.css");
     await mkdir("dist/kertas", { recursive: true });
     await copyFile("kertas/dist/kertas.wasm", "dist/kertas/kertas.wasm");
+    await copyFile("LICENSE-kertas.md", "dist/kertas/LICENSE.md");
+    await copyFile("node_modules/pdfjs-dist/build/pdf.worker.min.mjs", "dist/kertas/pdf.worker.min.mjs");
+    await copyFile("node_modules/pdfjs-dist/web/pdf_viewer.css", "dist/kertas/pdf_viewer.css");
     for (const lang of ["fr", "en"]) {
       await copyFile(`node_modules/dictionary-${lang}/index.aff`, `dist/kertas/dictionary-${lang}.aff`);
       await copyFile(`node_modules/dictionary-${lang}/index.dic`, `dist/kertas/dictionary-${lang}.dic`);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { serveKertasAssetsFrom } from "./assets";
 import { loadKertas, type Kertas } from "./engine";
 import type { Lang } from "./types";
 
@@ -31,6 +32,7 @@ async function withDictionaries(engine: Kertas, base: string): Promise<Kertas> {
 const loading = new Map<string, Promise<Kertas | null>>();
 
 function load(base: string): Promise<Kertas | null> {
+  serveKertasAssetsFrom(base);
   let engine = loading.get(base);
   if (!engine) {
     engine = loadKertas(new URL("kertas.wasm", base))

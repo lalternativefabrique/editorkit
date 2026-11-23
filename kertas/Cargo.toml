@@ -6,7 +6,7 @@ members = ["crates/kertas", "crates/kertas-wasm", "crates/kertas-ffi"]
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.90"
-license = "LicenseRef-Proprietary"
+license = "PolyForm-Noncommercial-1.0.0"
 publish = false
 
 [workspace.dependencies]

@@ -63,4 +63,4 @@ pnpm build
 
 ## License
 
-[MPL-2.0](LICENSE)
+[MPL-2.0](LICENSE), except the kertas engine and its writing surface (`kertas/`, `src/kertas/`, `@lalternative/editor/kertas`), which are under the [PolyForm Noncommercial License 1.0.0](LICENSE-kertas.md). Commercial use of kertas needs a separate licence.

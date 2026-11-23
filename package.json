@@ -49,7 +49,8 @@
     "./writing.css": "./dist/writing.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE-kertas.md"
   ],
   "scripts": {
     "build": "tsup",
@@ -151,5 +152,5 @@
       "optional": true
     }
   },
-  "license": "MPL-2.0"
+  "license": "(MPL-2.0 AND PolyForm-Noncommercial-1.0.0)"
 }
