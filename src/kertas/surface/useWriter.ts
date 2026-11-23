@@ -27,7 +27,6 @@ export interface WriterFiles {
   resolve: ResolveImage;
 }
 
-
 const SLASH = {
   labels: {
     heading1: "Grand titre",
@@ -59,7 +58,17 @@ export interface WriterPages {
 const single = (name: string, char: string, items: (query: string) => SlashItem[], allowSpaces = false) =>
   SlashCommands.extend({ name }).configure({ char, allowSpaces, emptyLabel: "", items, pluginKey: new PluginKey(name) });
 
-function writerExtensions(engine: Kertas, files: WriterFiles, pages: WriterPages | null, author: string, openPdf: (target: PdfTarget) => void) {
+export interface KertasWriterOptions {
+  engine: Kertas;
+  files: WriterFiles;
+  author: string;
+  pages?: WriterPages | null;
+  openPdf?: (target: PdfTarget) => void;
+  slash?: SlashItem[];
+}
+
+/** Every kertas writing extension, for an app that drives its own editor. */
+export function kertasWriterExtensions({ engine, files, author, pages = null, openPdf = () => undefined, slash = [] }: KertasWriterOptions) {
   const cited = pages ? pageRefItems(pages.all, pages.current, pages.create) : () => [];
   return [
     StarterKit.configure({
@@ -91,6 +100,7 @@ function writerExtensions(engine: Kertas, files: WriterFiles, pages: WriterPages
             ...formattingSlashItems(),
             ...writingSlashItems({ upload: files.upload }),
             ...kertasSlashItems(engine),
+            ...slash,
           ]),
         ),
     }),
@@ -131,7 +141,14 @@ export function useWriter({ engine, files, stored, body, label, author, pages = 
     onContentRef.current = onContent;
   }, [onContent]);
   const extensions = useMemo(
-    () => writerExtensions(engine, files, pages, author, (target) => setReading((prev) => ({ ...target, focus: (prev?.focus ?? 0) + 1 }))),
+    () =>
+      kertasWriterExtensions({
+        engine,
+        files,
+        pages,
+        author,
+        openPdf: (target) => setReading((prev) => ({ ...target, focus: (prev?.focus ?? 0) + 1 })),
+      }),
     [engine, files, pages, author],
   );
   const editor = useEditor(
