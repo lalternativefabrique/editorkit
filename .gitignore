@@ -1,6 +1,9 @@
 node_modules/
 .pnpm-store/
-dist/
+/dist/
+kertas/dist/*
+kertas/target/
 *.tsbuildinfo
 .DS_Store
 .sklp/cache/
+!kertas/dist/kertas.wasm

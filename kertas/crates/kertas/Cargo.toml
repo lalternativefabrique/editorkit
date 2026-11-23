@@ -1,0 +1,17 @@
+[package]
+name = "kertas"
+description = "Deterministic document structuring: blocks, typed tables, French typography"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+pulldown-cmark = { version = "0.13.6", default-features = false }
+serde.workspace = true
+serde_json.workspace = true
+spellbook = "0.4.2"
+
+[lints]
+workspace = true

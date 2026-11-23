@@ -1,0 +1,4 @@
+module KertasFFI {
+  header "kertas.h"
+  export *
+}
