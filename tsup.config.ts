@@ -9,6 +9,7 @@ export default defineConfig({
     "article-element": "src/article-element.ts",
     "article-vue": "src/article-vue.ts",
     "article-server": "src/article-server.tsx",
+    kertas: "src/kertas/index.ts",
   },
   format: ["esm"],
   dts: true,
@@ -31,5 +32,13 @@ export default defineConfig({
     await copyFile("src/article.css", "dist/article.css");
     await mkdir("dist/svelte", { recursive: true });
     await copyFile("src/svelte/Article.svelte", "dist/svelte/Article.svelte");
+    await copyFile("src/kertas/kertas.css", "dist/kertas.css");
+    await copyFile("src/kertas/surface/writing.css", "dist/writing.css");
+    await mkdir("dist/kertas", { recursive: true });
+    await copyFile("kertas/dist/kertas.wasm", "dist/kertas/kertas.wasm");
+    for (const lang of ["fr", "en"]) {
+      await copyFile(`node_modules/dictionary-${lang}/index.aff`, `dist/kertas/dictionary-${lang}.aff`);
+      await copyFile(`node_modules/dictionary-${lang}/index.dic`, `dist/kertas/dictionary-${lang}.dic`);
+    }
   },
 });

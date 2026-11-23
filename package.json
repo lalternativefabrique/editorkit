@@ -1,6 +1,6 @@
 {
   "name": "@lalternative/editor",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "Shared editor and article for L'Alternative apps: TipTap writing surface, article rendering and audio player for React, Vue, Svelte and plain JS",
   "type": "module",
   "main": "./dist/index.js",
@@ -39,7 +39,14 @@
     "./svelte": {
       "svelte": "./dist/svelte/Article.svelte",
       "default": "./dist/svelte/Article.svelte"
-    }
+    },
+    "./kertas": {
+      "import": "./dist/kertas.js",
+      "types": "./dist/kertas.d.ts"
+    },
+    "./kertas.css": "./dist/kertas.css",
+    "./kertas/assets/*": "./dist/kertas/*",
+    "./writing.css": "./dist/writing.css"
   },
   "files": [
     "dist"
@@ -51,11 +58,27 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "playground": "vite --config playground/vite.config.ts",
-    "playground:article": "vite --config playground/article/vite.config.ts"
+    "playground:article": "vite --config playground/article/vite.config.ts",
+    "build:wasm": "./kertas/build-wasm.sh",
+    "playground:kertas": "vite --config playground/kertas/vite.config.ts"
   },
   "dependencies": {
     "@mdx-js/mdx": "^3.1.1",
+    "@tanstack/react-table": "^9.3.1",
+    "@tanstack/react-virtual": "^3.14.26",
+    "@tiptap/extension-code-block-lowlight": "^3.31.4",
+    "@tiptap/extension-document": "^3.31.4",
+    "@tiptap/extension-highlight": "^3.31.4",
+    "@tiptap/extension-image": "^3.31.4",
+    "@tiptap/extension-list": "^3.31.4",
+    "@tiptap/extension-mathematics": "^3.31.4",
+    "@tiptap/extension-text-align": "^3.31.4",
+    "@tiptap/extension-text-style": "^3.31.4",
+    "fflate": "0.8.2",
+    "katex": "^0.19.1",
     "lit": "^3.3.3",
+    "lowlight": "^3.3.0",
+    "pdfjs-dist": "4.10.38",
     "remark-gfm": "^4.0.1"
   },
   "peerDependencies": {
@@ -72,14 +95,18 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
-    "@tiptap/core": "^3.29.2",
-    "@tiptap/pm": "^3.29.2",
-    "@tiptap/react": "^3.29.2",
-    "@tiptap/starter-kit": "^3.29.2",
-    "@tiptap/suggestion": "^3.29.2",
+    "@tiptap/core": "^3.31.4",
+    "@tiptap/pm": "^3.31.4",
+    "@tiptap/react": "^3.31.4",
+    "@tiptap/starter-kit": "^3.31.4",
+    "@tiptap/suggestion": "^3.31.4",
+    "@types/node": "^22.10.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "dictionary-en": "4.0.0",
+    "dictionary-fr": "3.0.0",
+    "happy-dom": "^21.0.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-native": "^0.81.6",
